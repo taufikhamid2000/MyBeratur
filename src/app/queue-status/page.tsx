@@ -13,6 +13,7 @@ import { states } from "@/data/states";
 import { branches } from "@/data/branches";
 import { services } from "@/data/services";
 import { userCategories } from "@/data/userCategories";
+import { useAuth } from "@/lib/AuthContext";
 
 interface QueueTicket {
   queueNumber: string;
@@ -99,6 +100,7 @@ const getAlternativeBranches = (
 const QueueStatusContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
   const [selectedDepartment, setSelectedDepartment] = useState<number | null>(
     null
   );
@@ -148,6 +150,12 @@ const QueueStatusContent = () => {
   }, [searchParams, router]);
 
   const generateQueueNumber = () => {
+    if (!user) {
+      const returnTo = `/queue-status?department=${selectedDepartment}&state=${selectedState}&branch=${selectedBranch}&service=${selectedService}&category=${selectedCategory}`;
+      router.push(`/login?redirect=${encodeURIComponent(returnTo)}`);
+      return;
+    }
+
     const branch = branches.find((b) => b.id === selectedBranch);
     const service = services.find((s) => s.id === selectedService);
     const category = userCategories.find((c) => c.id === selectedCategory);
@@ -533,11 +541,17 @@ const QueueStatusContent = () => {
             <div className="flex justify-center space-x-4">
               <button
                 onClick={generateQueueNumber}
-                className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                disabled={authLoading}
+                className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Ambil Nombor Giliran
+                {user ? "Ambil Nombor Giliran" : "Log Masuk untuk Ambil Nombor"}
               </button>
             </div>
+            {!user && !authLoading && (
+              <p className="mt-3 text-xs text-gray-500">
+                Anda perlu log masuk untuk mengambil nombor giliran.
+              </p>
+            )}
           </div>
         )}
 
