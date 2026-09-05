@@ -7,6 +7,11 @@ import { createClient } from "@supabase/supabase-js";
 // supabase.auth.getSession() on mount. Real requests against the placeholder
 // URL simply fail at runtime instead of at build time.
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_KEY || "placeholder-anon-key";
+// Prefer the standard name (what the Supabase↔Vercel integration injects);
+// NEXT_PUBLIC_SUPABASE_KEY is the legacy name and stays accepted as a fallback.
+const supabaseAnonKey =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
+  process.env.NEXT_PUBLIC_SUPABASE_KEY ??
+  "placeholder-anon-key";
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);

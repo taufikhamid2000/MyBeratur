@@ -42,12 +42,13 @@ npm install
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_KEY=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```
 
-   Note the key variable is `NEXT_PUBLIC_SUPABASE_KEY` (Supabase anon/public
-   key), not `NEXT_PUBLIC_SUPABASE_ANON_KEY` — see `src/lib/supabaseClient.ts`.
-   Without it, the app falls back to a non-functional placeholder client.
+   `NEXT_PUBLIC_SUPABASE_ANON_KEY` is the Supabase anon/public key (the name the
+   Supabase↔Vercel integration injects). The legacy name `NEXT_PUBLIC_SUPABASE_KEY`
+   is still accepted as a fallback — see `src/lib/supabaseClient.ts`. Without
+   either, the app falls back to a non-functional placeholder client.
 
 3. Run the development server:
 
