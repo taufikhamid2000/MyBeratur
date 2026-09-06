@@ -13,10 +13,11 @@ const fieldClass =
   "rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring";
 
 export function LoginForm() {
-  const { signIn } = useAuth();
+  const { signIn, startDemo } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [pending, setPending] = useState(false);
+  const [demoPending, setDemoPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -33,6 +34,22 @@ export function LoginForm() {
 
     if (signInError) {
       setError(signInError);
+      return;
+    }
+
+    router.push(searchParams.get("redirect") || "/");
+    router.refresh();
+  };
+
+  const handleDemo = async () => {
+    setError(null);
+    setDemoPending(true);
+
+    const { error: demoError } = await startDemo();
+    setDemoPending(false);
+
+    if (demoError) {
+      setError(demoError);
       return;
     }
 
@@ -89,6 +106,22 @@ export function LoginForm() {
               {pending ? "Sedang log masuk…" : "Log masuk"}
             </button>
           </form>
+
+          <div className="my-4 flex items-center gap-3 text-xs text-foreground/40">
+            <div className="h-px flex-1 bg-border" />
+            atau
+            <div className="h-px flex-1 bg-border" />
+          </div>
+
+          <button
+            type="button"
+            onClick={handleDemo}
+            disabled={demoPending}
+            className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-5 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          >
+            {demoPending && <Spinner />}
+            {demoPending ? "Memulakan demo…" : "Cuba demo — tanpa akaun"}
+          </button>
 
           <p className="mt-6 text-center text-sm text-foreground/60">
             Belum ada akaun?{" "}

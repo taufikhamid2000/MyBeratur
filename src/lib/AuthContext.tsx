@@ -28,6 +28,12 @@ interface AuthContextValue {
     details: SignUpDetails
   ) => Promise<{ error: string | null; needsEmailConfirmation: boolean }>;
   signOut: () => Promise<void>;
+  // "Cuba demo — tanpa akaun": anonymous sign-in so a visitor can try the
+  // queue flow instantly. No sample data is seeded (unlike duitduit's
+  // demo, MyBeratur's queue numbers are meant to reflect a real booking,
+  // so there's nothing meaningful to pre-fill) — the anonymous user just
+  // gets a real session and can use the app like any signed-up user.
+  startDemo: () => Promise<{ error: string | null }>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -99,6 +105,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await supabase.auth.signOut();
   }, []);
 
+  const startDemo = useCallback(async () => {
+    const { error } = await supabase.auth.signInAnonymously();
+    return { error: error ? error.message : null };
+  }, []);
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user: session?.user ?? null,
@@ -107,8 +118,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signIn,
       signUp,
       signOut,
+      startDemo,
     }),
-    [session, loading, signIn, signUp, signOut]
+    [session, loading, signIn, signUp, signOut, startDemo]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

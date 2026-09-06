@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import PageContainer from "@/components/Layout/PageContainer";
@@ -8,12 +8,35 @@ import Header from "@/components/Layout/Header";
 import SelectionCard from "@/components/Selection/SelectionCard";
 import ActionButtons from "@/components/Layout/ActionButtons";
 import { departments } from "@/data/departments";
+import { useAuth } from "@/lib/AuthContext";
 
 const HomePage = () => {
   const [selectedDepartment, setSelectedDepartment] = useState<number | null>(
     null
   );
   const router = useRouter();
+  const { user, loading } = useAuth();
+
+  // The queue app is only meant for signed-in (or anonymous-demo) users —
+  // bounce anonymous-in-the-plain-English-sense visitors to /login, which
+  // itself offers a one-click anonymous demo sign-in for anyone who just
+  // wants to try it. Wait for the auth check to resolve first so a
+  // logged-in user isn't flashed the login page on a hard refresh.
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/login?redirect=/");
+    }
+  }, [loading, user, router]);
+
+  if (loading || !user) {
+    return (
+      <PageContainer>
+        <div className="flex min-h-[50vh] items-center justify-center text-sm text-gray-500">
+          Memuatkan...
+        </div>
+      </PageContainer>
+    );
+  }
 
   const handleNext = () => {
     if (selectedDepartment) {
