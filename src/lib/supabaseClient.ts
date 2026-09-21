@@ -14,4 +14,6 @@ const supabaseAnonKey =
   process.env.NEXT_PUBLIC_SUPABASE_KEY ??
   "placeholder-anon-key";
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  db: { schema: "myberatur" },
+});
